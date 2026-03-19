@@ -6,7 +6,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "contextMenus"],
   "host_permissions": [
     "<all_urls>",
     "http://localhost/*",

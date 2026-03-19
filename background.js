@@ -1,6 +1,60 @@
 // background.js
 // Routes requests from the content script to either local Ollama or Google Gemini.
 
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "scan-page",
+    title: "Varrer questões desta página",
+    contexts: ["page", "action"]
+  });
+
+  chrome.contextMenus.create({
+    id: "analyze-selection",
+    title: "Analisar com IA",
+    contexts: ["selection"]
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "scan-page") {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ["content.js"],
+    });
+  } else if (info.menuItemId === "analyze-selection") {
+    // We send a message to show the loading indicator first
+    chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING", payload: "Analisando seleção..." });
+    
+    // Process the analysis
+    handleTextAnalysis(info.selectionText, tab.id);
+  }
+});
+
+async function handleTextAnalysis(text, tabId) {
+    try {
+      const opts = await getOptions();
+      const prompt = `Analise o seguinte texto e forneça uma explicação breve e útil. Se for uma questão, indique qual parece ser a resposta correta e por quê.\n\nTexto:\n${text}`;
+
+      let responseText;
+      if (opts.useGemini) {
+        responseText = await queryGemini(prompt, opts);
+      } else {
+        responseText = await queryOllama(prompt, opts);
+      }
+      
+      chrome.tabs.sendMessage(tabId, {
+        type: "SHOW_RESPONSE",
+        payload: responseText,
+      });
+
+    } catch (error) {
+      chrome.tabs.sendMessage(tabId, {
+        type: "AI_ERROR",
+        payload: { message: error.message },
+      });
+    }
+}
+
 const DEFAULT_OPTIONS = {
   useOllama: true,
   ollamaEndpoint: "http://localhost:11434",
@@ -38,7 +92,22 @@ async function queryOllama(prompt, opts) {
   });
 
   if (!response.ok) {
-    throw new Error(`Ollama request failed: ${response.statusText}`);
+    const errorBody = await response.text();
+    let errorMessage = `Ollama Error (${response.status}): ${response.statusText}`;
+    
+    try {
+      const errorJson = JSON.parse(errorBody);
+      if (errorJson.error) {
+        errorMessage = `Ollama Error: ${errorJson.error}`;
+      }
+    } catch (e) {
+      if (errorBody) errorMessage += ` - ${errorBody}`;
+    }
+
+    if (response.status === 403) {
+      throw new Error(`Ollama access forbidden (403). Certifique-se de que OLLAMA_ORIGINS="*" está configurado.`);
+    }
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
@@ -77,13 +146,13 @@ async function queryGemini(prompt, opts) {
 }
 
 function buildPrompt(questions) {
-  const questionData = questions.map((q, index) => {
+  const questionData = questions.map((q) => {
     const choices = q.choices.map((c, idx) => ({
-      key: String.fromCharCode(65 + idx),
-      text: c,
+      key: c.key || String.fromCharCode(65 + idx),
+      text: typeof c === 'string' ? c : c.text,
     }));
     return {
-      id: index,
+      questionId: q.questionId || q.id,
       question: q.question,
       choices: choices,
     };
@@ -93,7 +162,7 @@ function buildPrompt(questions) {
     You are an expert assistant. For each multiple-choice question provided below, identify the correct answer.
     Your response MUST be a valid JSON object.
     The JSON object should contain a single key "answers", which is an array of objects.
-    Each object in the array must have two keys: "questionId" (the original ID of the question) and "bestChoice" (the letter of the correct answer, e.g., "A", "B", "C").
+    Each object in the array must have two keys: "questionId" (matching the questionId provided) and "bestChoice" (the exact 'key' of the correct answer from the choices list).
 
     Here are the questions:
     ${JSON.stringify(questionData, null, 2)}
@@ -101,8 +170,12 @@ function buildPrompt(questions) {
 }
 
 function parseResponse(responseText) {
+    // Extract JSON if the LLM wrapped it in markdown or text
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    const cleanText = jsonMatch ? jsonMatch[0] : responseText;
+
     try {
-        const json = JSON.parse(responseText);
+        const json = JSON.parse(cleanText);
         const answers = json.answers;
         if (!Array.isArray(answers)) return [];
         
@@ -113,17 +186,7 @@ function parseResponse(responseText) {
 
     } catch (e) {
         console.error("Failed to parse LLM JSON response:", e, "\nRaw text:", responseText);
-        // Fallback for non-JSON text responses, trying to be clever
-        const lines = responseText.trim().split('\n');
-        const answers = [];
-        let questionIdCounter = 0;
-        for (const line of lines) {
-            const match = line.match(/\b([A-Z])\b/);
-            if (match) {
-                answers.push({ questionId: questionIdCounter++, answer: match[1] });
-            }
-        }
-        return answers;
+        return [];
     }
 }
 

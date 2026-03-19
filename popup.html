@@ -2,28 +2,123 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCQ Helper</title>
     <style>
+      :root {
+        --system-blue: #007AFF;
+        --system-green: #34C759;
+        --bg-color: #f5f5f7;
+      }
       body {
-        font-family: system-ui, sans-serif;
-        width: 320px;
-        padding: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        width: 300px;
+        color: #1d1d1f;
+        padding: 20px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #00C974 0%, #007AFF 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+      p {
+        font-size: 13px;
+        color: #86868b;
+        text-align: center;
+        margin: 0;
+        line-height: 1.4;
+      }
+      .actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
       button {
-        margin-top: 8px;
+        background-color: var(--system-blue);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         width: 100%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      button:hover {
+        background-color: #0062CC;
+        transform: scale(1.02);
+      }
+      button:active {
+        transform: scale(0.98);
+      }
+      .secondary-btn {
+        background-color: transparent;
+        color: var(--system-blue);
+        text-decoration: none;
+        font-size: 13px;
+        text-align: center;
+        padding: 8px;
+        border-radius: 8px;
+        display: block;
+      }
+      .secondary-btn:hover {
+        background-color: rgba(0, 122, 255, 0.1);
+      }
+      .divider {
+        height: 1px;
+        background-color: rgba(0,0,0,0.05);
+        width: 100%;
+        margin: 4px 0;
       }
     </style>
   </head>
   <body>
-    <h2>MCQ Helper</h2>
-    <p>Press the button to scan the current tab and highlight answers.</p>
-    <button id="scan">Scan & Highlight</button>
-    <p style="font-size: 12px; margin-top: 12px">
-      Settings are in the <a href="#" id="optionsLink">options</a> page.
-    </p>
+    <div class="container">
+      <div class="logo-area">
+        <div class="logo-icon">Q</div>
+        <h1>MCQ Helper</h1>
+        <p>Analyze questions and find answers instantly using AI.</p>
+      </div>
 
-    <script src="popup.js" defer></script>
+      <div class="divider"></div>
+
+      <div class="actions">
+        <button id="scan">Scan Questions</button>
+        <a href="#" id="optionsLink" class="secondary-btn">Extension Settings</a>
+      </div>
+    </div>
+    <script src="popup.js"></script>
   </body>
 </html>

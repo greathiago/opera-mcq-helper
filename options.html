@@ -3,113 +3,222 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MCQ Helper Options</title>
+    <title>MCQ Helper Settings</title>
     <style>
+      :root {
+        --system-blue: #007AFF;
+        --bg-color: #f5f5f7;
+        --card-bg: #ffffff;
+        --text-primary: #1d1d1f;
+        --text-secondary: #86868b;
+        --border-color: #d2d2d7;
+      }
       body {
-        font-family: system-ui, sans-serif;
-        max-width: 520px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 40px 20px;
+        line-height: normal;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      header {
+        margin-bottom: 32px;
+      }
+      h1 {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin: 0;
+      }
+      h2 {
+        font-size: 19px;
+        font-weight: 600;
+        margin: 32px 0 12px 16px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 13px;
+      }
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+        margin-bottom: 24px;
+      }
+      .setting-row {
         padding: 16px;
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #f2f2f2;
       }
-      h1, h2 {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 8px;
-        margin-top: 24px;
-        margin-bottom: 16px;
+      .setting-row:last-child {
+        border-bottom: none;
       }
-      h1 { margin-top: 0; }
+      .setting-row.horizontal {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
       label {
-        display: block;
-        margin-top: 12px;
         font-weight: 500;
+        font-size: 15px;
+        margin-bottom: 4px;
       }
       input[type="text"],
-      input[type="url"] {
+      input[type="url"],
+      select {
+        background-color: #f2f2f7;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 15px;
+        margin-top: 6px;
         width: 100%;
-        padding: 8px;
-        margin-top: 4px;
         box-sizing: border-box;
+        transition: background-color 0.2s;
+        outline-color: var(--system-blue);
       }
-      .row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        margin-top: 8px;
-      }
-      button {
-        margin-top: 24px;
-        padding: 10px 14px;
-        cursor: pointer;
+      input[type="text"]:focus,
+      input[type="url"]:focus {
+        background-color: #e5e5ea;
       }
       .hint {
-        font-size: 12px;
-        color: #555;
-        font-weight: 400;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        line-height: 1.4;
       }
-      .provider-toggle {
-        font-size: 1.1em;
+      .radio-group {
+        display: flex;
+        gap: 16px;
+        margin-top: 8px;
+      }
+      .radio-option {
+         flex: 1;
+         position: relative;
+      }
+      .radio-option input {
+         display: none;
+      }
+      .radio-label {
+         display: block;
+         padding: 12px;
+         text-align: center;
+         background: #f2f2f7;
+         border-radius: 10px;
+         cursor: pointer;
+         font-weight: 600;
+         font-size: 14px;
+         transition: all 0.2s;
+      }
+      .radio-option input:checked + .radio-label {
+         background: var(--system-blue);
+         color: white;
+      }
+      button#save {
+        background-color: var(--system-blue);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        margin-top: 20px;
+      }
+      button#save:hover {
+        background-color: #0062CC;
+      }
+      button#refreshModels {
+        background: transparent;
+        border: none;
+        color: var(--system-blue);
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0;
+        margin-left: 8px;
+      }
+      .row-flex {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        width: 100%;
+      }
+      #status {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 16px;
+        height: 20px;
       }
     </style>
   </head>
   <body>
-    <h1>MCQ Helper Settings</h1>
+    <div class="container">
+      <header>
+        <h1>Settings</h1>
+      </header>
 
-    <h2>AI Provider</h2>
-    <label class="provider-toggle">
-      <input type="radio" name="provider" value="ollama" id="useOllama" />
-       Use local Ollama
-    </label>
-    <label class="provider-toggle">
-      <input type="radio" name="provider" value="gemini" id="useGemini" />
-       Use Google Gemini
-    </label>
-    
+      <h2>AI Provider</h2>
+      <div class="card">
+        <div class="setting-row">
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="provider" value="ollama" id="useOllama" />
+              <div class="radio-label">Local Ollama</div>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="provider" value="gemini" id="useGemini" />
+              <div class="radio-label">Google Gemini</div>
+            </label>
+          </div>
+        </div>
+      </div>
 
-    <h2 id="ollama-settings-header">Ollama Settings</h2>
-    <div id="ollama-settings">
-        <label for="ollamaEndpoint">
-            Ollama endpoint URL:
-        </label>
-        <input
-            type="url"
-            id="ollamaEndpoint"
-            placeholder="http://localhost:11434"
-        />
-        <p class="hint">
-            The URL where your local Ollama instance is running.
-        </p>
+      <div id="ollama-settings-container">
+        <h2>Ollama Configuration</h2>
+        <div class="card" id="ollama-settings">
+          <div class="setting-row">
+            <label for="ollamaEndpoint">Endpoint URL</label>
+            <input type="url" id="ollamaEndpoint" placeholder="http://localhost:11434" />
+            <p class="hint">The local URL where Ollama is serving requests.</p>
+          </div>
+          <div class="setting-row">
+            <label for="ollamaModel">Active Model</label>
+            <div class="row-flex">
+              <select id="ollamaModel">
+                <option value="">Carregando modelos...</option>
+              </select>
+              <button id="refreshModels">Atualizar</button>
+            </div>
+            <p class="hint">Select a model previously "pulled" to your machine.</p>
+          </div>
+        </div>
+      </div>
 
-        <label for="ollamaModel">
-            Ollama Model Name:
-        </label>
-        <input
-            type="text"
-            id="ollamaModel"
-            placeholder="e.g., llama3, codellama"
-        />
-        <p class="hint">
-            The name of the model to use from Ollama. Must be pulled locally.
-        </p>
+      <div id="gemini-settings-container">
+        <h2>Gemini Configuration</h2>
+        <div class="card" id="gemini-settings">
+          <div class="setting-row">
+            <label for="geminiApiKey">API Key</label>
+            <input type="text" id="geminiApiKey" placeholder="Paste your Gemini API key here" />
+            <p class="hint">Get your key from Google AI Studio. We use gemini-1.5-flash.</p>
+          </div>
+        </div>
+      </div>
+
+      <button id="save">Save Changes</button>
+      <p id="status"></p>
     </div>
-
-
-    <h2 id="gemini-settings-header">Gemini Settings</h2>
-    <div id="gemini-settings">
-        <label for="geminiApiKey">
-            Gemini API Key:
-        </label>
-        <input
-            type="text"
-            id="geminiApiKey"
-            placeholder="Enter your Google AI API key"
-        />
-        <p class="hint">
-            You can get a key from Google AI Studio. The extension uses the gemini-1.5-flash-latest model.
-        </p>
-    </div>
-
-
-    <button id="save">Save settings</button>
-    <p id="status" style="margin-top: 12px; font-size: 13px"></p>
 
     <script src="options.js" defer></script>
   </body>
