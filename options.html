@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCQ Helper Options</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 520px;
+        padding: 16px;
+      }
+      h1, h2 {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+      }
+      h1 { margin-top: 0; }
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 500;
+      }
+      input[type="text"],
+      input[type="url"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        box-sizing: border-box;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 8px;
+      }
+      button {
+        margin-top: 24px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .hint {
+        font-size: 12px;
+        color: #555;
+        font-weight: 400;
+      }
+      .provider-toggle {
+        font-size: 1.1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MCQ Helper Settings</h1>
+
+    <h2>AI Provider</h2>
+    <label class="provider-toggle">
+      <input type="radio" name="provider" value="ollama" id="useOllama" />
+       Use local Ollama
+    </label>
+    <label class="provider-toggle">
+      <input type="radio" name="provider" value="gemini" id="useGemini" />
+       Use Google Gemini
+    </label>
+    
+
+    <h2 id="ollama-settings-header">Ollama Settings</h2>
+    <div id="ollama-settings">
+        <label for="ollamaEndpoint">
+            Ollama endpoint URL:
+        </label>
+        <input
+            type="url"
+            id="ollamaEndpoint"
+            placeholder="http://localhost:11434"
+        />
+        <p class="hint">
+            The URL where your local Ollama instance is running.
+        </p>
+
+        <label for="ollamaModel">
+            Ollama Model Name:
+        </label>
+        <input
+            type="text"
+            id="ollamaModel"
+            placeholder="e.g., llama3, codellama"
+        />
+        <p class="hint">
+            The name of the model to use from Ollama. Must be pulled locally.
+        </p>
+    </div>
+
+
+    <h2 id="gemini-settings-header">Gemini Settings</h2>
+    <div id="gemini-settings">
+        <label for="geminiApiKey">
+            Gemini API Key:
+        </label>
+        <input
+            type="text"
+            id="geminiApiKey"
+            placeholder="Enter your Google AI API key"
+        />
+        <p class="hint">
+            You can get a key from Google AI Studio. The extension uses the gemini-1.5-flash-latest model.
+        </p>
+    </div>
+
+
+    <button id="save">Save settings</button>
+    <p id="status" style="margin-top: 12px; font-size: 13px"></p>
+
+    <script src="options.js" defer></script>
+  </body>
+</html>
